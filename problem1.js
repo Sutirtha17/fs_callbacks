@@ -14,7 +14,7 @@ const createAndDeleteFiles = (cb) => {
       cb(error);
     } else {
       cb(null, data);
-      createFiles((error, data) => {
+      createAndDelete((error, data) => {
         if (error) {
           cb(error);
         } else {
@@ -35,7 +35,7 @@ const createDirectory = (callback) => {
   });
 };
 
-const createFiles = (callback) => {
+const createAndDelete = (callback) => {
   for (let i = 0; i < Math.floor(Math.random() * 500); i++) {
     const fileName = './newDirectory/random' + i + '.json';
     fs.writeFile(fileName, '', (error) => {
