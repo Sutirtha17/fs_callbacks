@@ -24,6 +24,7 @@ const lipsumProblem = (filePath, cb) => {
         } else {
           const upperCaseFile = 'upperCaseFile.txt';
           const upperCaseText = data.toUpperCase();
+
           writeFile(upperCaseFile, upperCaseText, (error, data) => {
             if (error) {
               cb(error);
@@ -39,17 +40,12 @@ const lipsumProblem = (filePath, cb) => {
                       if (error) {
                         cb(error);
                       } else {
-                        const splitedSentences = data
-                          .toLowerCase()
-                          .replace(/\.+/g, '.|')
-                          .replace(/\?/g, '?|')
-                          .replace(/\!/g, '!|')
-                          .split('|')
+                        const lowerCaseText = data.toLowerCase();
+                        const splitedSentences = lowerCaseText
+                          .split('. ')
                           .join('\n');
-                        // console.log(lowerCaseText);
-                        // const splitedSentences = [lowerCaseText, '\n'].join('');
-                        // console.log(splitedSentences);
                         const lowerCaseFile = 'lowerCaseFile.txt';
+
                         writeFile(
                           lowerCaseFile,
                           splitedSentences,
@@ -57,7 +53,6 @@ const lipsumProblem = (filePath, cb) => {
                             if (error) {
                               cb(error);
                             } else {
-                              // console.log(data);
                               appendToStorage(
                                 storageFile,
                                 lowerCaseFile + os.EOL,
@@ -65,7 +60,6 @@ const lipsumProblem = (filePath, cb) => {
                                   if (error) {
                                     cb(error);
                                   } else {
-                                    // console.log(data);
                                     readFile(lowerCaseFile, (error, data) => {
                                       if (error) {
                                         cb(error);
@@ -74,8 +68,8 @@ const lipsumProblem = (filePath, cb) => {
                                           .split('\n')
                                           .sort()
                                           .join('\n');
-                                        // console.log(sortedData);
                                         const sortedFile = 'sortedFile.txt';
+
                                         writeFile(
                                           sortedFile,
                                           sortedData,
@@ -90,7 +84,6 @@ const lipsumProblem = (filePath, cb) => {
                                                   if (error) {
                                                     cb(error);
                                                   } else {
-                                                    // console.log(data);
                                                     readFile(
                                                       storageFile,
                                                       (error, data) => {
@@ -99,6 +92,7 @@ const lipsumProblem = (filePath, cb) => {
                                                         } else {
                                                           const fileNames =
                                                             data.split('\n');
+
                                                           for (
                                                             let i = 0;
                                                             i <
@@ -169,7 +163,6 @@ const writeFile = (filePath, upperCaseText, callback) => {
 
 const appendToStorage = (storageFile, fileName, callback) => {
   fs.appendFile(storageFile, fileName, (error, data) => {
-    console.log(fileName);
     if (error) {
       callback(error);
     }
