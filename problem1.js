@@ -8,54 +8,64 @@
 
 const fs = require('fs');
 
-const createAndDeleteFiles = (cb) => {
-  createDirectory((error, data) => {
-    if (error) {
-      cb(error);
-    } else {
-      cb(null, data);
-      createAndDelete((error, data) => {
+const createAndDeleteFiles = () => {
+  return new Promise((resolve, reject) => {
+    createDirectory()
+      .then(() => {
+        createAndDelete()
+          .then(() => {
+            resolve();
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      })
+      .catch((error) => {
+        reject(error);
+      });
+  });
+};
+
+const createDirectory = () => {
+  return new Promise((resolve, reject) => {
+    fs.mkdir('./newDirectory', { recursive: true }, (error) => {
+      if (error) {
+        reject(error);
+      } else {
+        console.log('directory is created');
+      }
+    });
+    resolve();
+  });
+};
+
+const createAndDelete = () => {
+  return new Promise((resolve, reject) => {
+    for (let i = 0; i < Math.floor(Math.random() * 500); i++) {
+      const fileName = './newDirectory/random' + i + '.json';
+      fs.writeFile(fileName, '', (error) => {
         if (error) {
-          cb(error);
+          reject(error);
         } else {
-          cb(null, data);
+          console.log(`${fileName} is created!`);
+          deleteFiles(fileName);
         }
       });
     }
+    resolve();
   });
 };
 
-const createDirectory = (callback) => {
-  fs.mkdir('./newDirectory', { recursive: true }, (error) => {
-    if (error) {
-      callback(error);
-    } else {
-      callback(null, 'Directory created!');
-    }
-  });
-};
-
-const createAndDelete = (callback) => {
-  for (let i = 0; i < Math.floor(Math.random() * 500); i++) {
-    const fileName = './newDirectory/random' + i + '.json';
-    fs.writeFile(fileName, '', (error) => {
+const deleteFiles = (fileName) => {
+  return new Promise((resolve, reject) => {
+    fs.unlink(fileName, (error) => {
       if (error) {
-        callback(error);
+        reject(error);
       } else {
-        callback(null, `${fileName} is created!`);
-        deleteFiles(fileName, callback);
+        console.log(`${fileName} 'is deleted!`);
       }
     });
-  }
-};
-
-const deleteFiles = (fileName, callback) => {
-  fs.unlink(fileName, (error) => {
-    if (error) {
-      callback(error);
-    } else {
-      callback(null, `${fileName} 'is deleted!`);
-    }
+    resolve();
   });
 };
 
