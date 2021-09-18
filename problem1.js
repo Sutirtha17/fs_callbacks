@@ -12,13 +12,10 @@ const createAndDeleteFiles = () => {
   return new Promise((resolve, reject) => {
     createDirectory()
       .then(() => {
-        createAndDelete()
-          .then(() => {
-            resolve();
-          })
-          .catch((error) => {
-            reject(error);
-          });
+        createAndDelete();
+      })
+      .then(() => {
+        resolve();
       })
       .catch((error) => {
         reject(error);
