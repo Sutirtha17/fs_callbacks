@@ -1,8 +1,10 @@
 const lipsumFilePath = '../data/lipsum.txt';
 const lipsumProblem = require('../problem2.js');
 
-lipsumProblem(lipsumFilePath, (error, data) => {
-  if (error) {
+lipsumProblem(lipsumFilePath)
+  .then((message) => {
+    console.log(message);
+  })
+  .catch((error) => {
     console.log(error);
-  }
-});
+  });

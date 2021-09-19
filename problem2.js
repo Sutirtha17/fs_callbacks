@@ -8,180 +8,92 @@
         4. Read the new files, sort the content, write it out to a new file. Store the name of the new file in filenames.txt
         5. Read the contents of filenames.txt and delete all the new files that are mentioned in that list simultaneously.
 */
-const fs = require('fs');
-const os = require('os');
 
-const lipsumProblem = (filePath, cb) => {
-  const storageFile = 'filenames.txt';
+const fsPromises = require('fs').promises;
 
-  writeFile(storageFile, '', (error, data) => {
-    if (error) {
-      cb(error);
-    } else {
-      readFile(filePath, (error, data) => {
-        if (error) {
-          cb(error);
-        } else {
-          const upperCaseFile = 'upperCaseFile.txt';
-          const upperCaseText = data.toUpperCase();
+const readFile = (filePath) => {
+  return fsPromises.readFile(filePath, 'utf-8');
+};
 
-          writeFile(upperCaseFile, upperCaseText, (error, data) => {
-            if (error) {
-              cb(error);
-            } else {
-              appendToStorage(
-                storageFile,
-                upperCaseFile + os.EOL,
-                (error, data) => {
-                  if (error) {
-                    cb(error);
-                  } else {
-                    readFile(upperCaseFile, (error, data) => {
-                      if (error) {
-                        cb(error);
-                      } else {
-                        const lowerCaseText = data.toLowerCase();
-                        const splitedSentences = lowerCaseText
-                          .split('. ')
-                          .join('\n');
-                        const lowerCaseFile = 'lowerCaseFile.txt';
+const writeFile = (filePath, upperCaseText) => {
+  return fsPromises.writeFile(filePath, upperCaseText);
+};
 
-                        writeFile(
-                          lowerCaseFile,
-                          splitedSentences,
-                          (error, data) => {
-                            if (error) {
-                              cb(error);
-                            } else {
-                              appendToStorage(
-                                storageFile,
-                                lowerCaseFile + os.EOL,
-                                (error, data) => {
-                                  if (error) {
-                                    cb(error);
-                                  } else {
-                                    readFile(lowerCaseFile, (error, data) => {
-                                      if (error) {
-                                        cb(error);
-                                      } else {
-                                        const sortedData = data
-                                          .split('\n')
-                                          .sort()
-                                          .join('\n');
-                                        const sortedFile = 'sortedFile.txt';
+const appendToStorage = (storageFile, fileName) => {
+  return fsPromises.appendFile(storageFile, fileName);
+};
 
-                                        writeFile(
-                                          sortedFile,
-                                          sortedData,
-                                          (error, data) => {
-                                            if (error) {
-                                              cb(error);
-                                            } else {
-                                              appendToStorage(
-                                                storageFile,
-                                                sortedFile + os.EOL,
-                                                (error, data) => {
-                                                  if (error) {
-                                                    cb(error);
-                                                  } else {
-                                                    readFile(
-                                                      storageFile,
-                                                      (error, data) => {
-                                                        if (error) {
-                                                          cb(error);
-                                                        } else {
-                                                          const fileNames =
-                                                            data.split('\n');
+const deleteFiles = (fileName) => {
+  //return fsPromises.unlink(fileName);
+};
 
-                                                          for (
-                                                            let i = 0;
-                                                            i <
-                                                            fileNames.length;
-                                                            i++
-                                                          )
-                                                            deleteFiles(
-                                                              fileNames[i],
-                                                              (error, data) => {
-                                                                if (error) {
-                                                                  cb(error);
-                                                                } else {
-                                                                  console.log(
-                                                                    data
-                                                                  );
-                                                                }
-                                                              }
-                                                            );
-                                                        }
-                                                      }
-                                                    );
-                                                  }
-                                                }
-                                              );
-                                            }
-                                          }
-                                        );
-                                      }
-                                    });
-                                  }
-                                }
-                              );
-                            }
-                          }
-                        );
-                      }
-                    });
-                  }
-                }
-              );
-            }
-          });
-        }
+const lipsumProblem = (filePath) => {
+  return new Promise((resolve, reject) => {
+    const storageFile = 'filenames.txt';
+    const lowerCaseFile = 'lowerCaseFile.txt';
+    const upperCaseFile = 'upperCaseFile.txt';
+    const sortedFile = 'sortedFile.txt';
+
+    readFile(filePath)
+      .then((data) => {
+        const upperCaseText = data.toUpperCase();
+
+        return writeFile(upperCaseFile, upperCaseText);
+      })
+
+      .then(() => {
+        return writeFile(storageFile, upperCaseFile + '\n');
+      })
+
+      .then(() => {
+        return readFile(upperCaseFile);
+      })
+
+      .then((data) => {
+        const lowerCaseText = data.toLowerCase();
+        const splitedSentences = lowerCaseText.split('. ').join('\n');
+
+        return writeFile(lowerCaseFile, splitedSentences);
+      })
+
+      .then(() => {
+        return appendToStorage(storageFile, lowerCaseFile + '\n');
+      })
+
+      .then(() => {
+        return readFile(lowerCaseFile);
+      })
+
+      .then((data) => {
+        const sortedData = data.split('\n').sort().join('\n');
+
+        return writeFile(sortedFile, sortedData);
+      })
+
+      .then(() => {
+        return appendToStorage(storageFile, sortedFile);
+      })
+
+      .then(() => {
+        return readFile(storageFile);
+      })
+
+      .then((data) => {
+        const fileNames = data.split('\n');
+
+        fileNames.forEach((eachFile) => {
+          deleteFiles(eachFile);
+        });
+      })
+
+      .then(() => {
+        resolve('Success!');
+      })
+
+      .catch((error) => {
+        reject(error);
       });
-    }
   });
-};
-
-const readFile = (filePath, callback) => {
-  fs.readFile(filePath, 'utf8', (error, data) => {
-    if (error) {
-      callback(error);
-    } else {
-      callback(null, data);
-    }
-  });
-};
-
-const writeFile = (filePath, upperCaseText, callback) => {
-  fs.writeFile(filePath, upperCaseText, (error, data) => {
-    if (error) {
-      callback(error);
-    } else {
-      callback(null, '');
-    }
-  });
-};
-
-const appendToStorage = (storageFile, fileName, callback) => {
-  fs.appendFile(storageFile, fileName, (error, data) => {
-    if (error) {
-      callback(error);
-    }
-    data = 'Saved!';
-    callback(null, data);
-  });
-};
-
-const deleteFiles = (fileName, callback) => {
-  if (fileName != '') {
-    fs.unlink(fileName, (error, data) => {
-      if (error) {
-        callback(error);
-      } else {
-        data = `${fileName} is deleted!`;
-        callback(null, data);
-      }
-    });
-  }
 };
 
 module.exports = lipsumProblem;

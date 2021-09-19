@@ -6,13 +6,13 @@
         2. Delete those files simultaneously 
 */
 
-const fs = require('fs');
+const fsPromises = require('fs').promises;
 
 const createAndDeleteFiles = () => {
   return new Promise((resolve, reject) => {
     createDirectory()
       .then(() => {
-        createAndDelete();
+        return createAndDelete();
       })
       .then(() => {
         resolve();
@@ -24,46 +24,22 @@ const createAndDeleteFiles = () => {
 };
 
 const createDirectory = () => {
-  return new Promise((resolve, reject) => {
-    fs.mkdir('./newDirectory', { recursive: true }, (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        console.log('directory is created');
-      }
-    });
-    resolve();
-  });
-};
-
-const createAndDelete = () => {
-  return new Promise((resolve, reject) => {
-    for (let i = 0; i < Math.floor(Math.random() * 500); i++) {
-      const fileName = './newDirectory/random' + i + '.json';
-      fs.writeFile(fileName, '', (error) => {
-        if (error) {
-          reject(error);
-        } else {
-          console.log(`${fileName} is created!`);
-          deleteFiles(fileName);
-        }
-      });
-    }
-    resolve();
-  });
+  return fsPromises.mkdir('./newDirectory', { recursive: true });
 };
 
 const deleteFiles = (fileName) => {
-  return new Promise((resolve, reject) => {
-    fs.unlink(fileName, (error) => {
-      if (error) {
-        reject(error);
-      } else {
-        console.log(`${fileName} 'is deleted!`);
-      }
-    });
-    resolve();
+  return fsPromises.unlink(fileName).then(() => {
+    console.log(fileName.split('/')[2] + ' is deleted.');
   });
+};
+const createAndDelete = () => {
+  for (let i = 0; i < 500 + Math.floor(Math.random() * 500); i++) {
+    const fileName = './newDirectory/random' + i + '.json';
+    fsPromises.writeFile(fileName, '').then(() => {
+      console.log(fileName.split('/')[2] + ' is created.');
+      deleteFiles(fileName);
+    });
+  }
 };
 
 module.exports = createAndDeleteFiles;
