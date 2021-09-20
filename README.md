@@ -1,6 +1,6 @@
 # fs_Callbacks Drills
 
-This project is for getting solutions of particular problems using **`callbacks`** and **creating** and **deleting** files asynchronously.
+This project is for getting solutions of particular problems using **`promises`** and **creating** and **deleting** files asynchronously.
 
 ## Installations
 
@@ -21,7 +21,7 @@ This project is for getting solutions of particular problems using **`callbacks`
 ### 4. Clone the repository :
 
 ```
-git clone https://github.com/Sutirtha17/fs_callbacks.git
+git clone -b promises https://github.com/Sutirtha17/fs_callbacks.git
 ```
 
 ### 5. Go to the working directory
